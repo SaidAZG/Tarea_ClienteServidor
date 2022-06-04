@@ -23,6 +23,7 @@ public class ServerActivity extends Activity {
     ActivityServerBinding binding;
     int port = 3030;
     Server server;
+    ServerSocket s;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,7 +32,24 @@ public class ServerActivity extends Activity {
         setContentView(binding.getRoot());
         binding.etPort.setText("3030");
 
-        binding.btnStartServer.setOnClickListener(v -> startServer(server));
+        binding.btnStartServer.setOnClickListener(v -> {
+            s = null;
+            if (Objects.requireNonNull(binding.etPort.getText()).length() > 0){
+                port = Integer.parseInt(binding.etPort.getText().toString());
+            }
+            try{
+                s = new ServerSocket(port);
+                Log.d("Con Status","Iniciado en puerto "+port);
+                desplegarMensajeServer(0,"Server iniciado en puerto: "+port);
+                binding.btnMsgServer.setEnabled(true);
+                binding.etMsgServer.setEnabled(true);
+            } catch(IOException e){
+                Log.d("Con Status","No se puedo iniciar en puerto "+port);
+                desplegarMensajeServer(0,e.getMessage());
+            }
+            server = new Server(s);
+            server.start();
+        });
 
         binding.btnMsgServer.setOnClickListener(v->sendMsg(server));
     }
