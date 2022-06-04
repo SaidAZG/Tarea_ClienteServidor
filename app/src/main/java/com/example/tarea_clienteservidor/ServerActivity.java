@@ -22,6 +22,7 @@ import java.util.Objects;
 public class ServerActivity extends Activity {
     ActivityServerBinding binding;
     int port = 3030;
+    Server server;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,16 +31,23 @@ public class ServerActivity extends Activity {
         setContentView(binding.getRoot());
         binding.etPort.setText("3030");
 
+        binding.btnStartServer.setOnClickListener(v -> startServer(server));
 
-        binding.btnStartServer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startServer();
-            }
-        });
+        binding.btnMsgServer.setOnClickListener(v->sendMsg(server));
     }
 
-    private void startServer() {
+    private void sendMsg(Server server) {
+        try{
+            String msg = "Hola nuevamente";
+            server.dos.writeUTF(msg);
+            desplegarMensajeServer(1,msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+            desplegarMensajeServer(0,e.getMessage());
+        }
+    }
+
+    private void startServer(Server server) {
         ServerSocket s = null;
 
         if (Objects.requireNonNull(binding.etPort.getText()).length() > 0){
@@ -58,12 +66,15 @@ public class ServerActivity extends Activity {
 
         ServerSocket finalS = s;
 
-        Thread server = new Thread(new Server(finalS));
+        server = new Server(finalS);
         server.start();
     }
 
     public class Server extends Thread{
         ServerSocket s;
+        Socket s1;
+        OutputStream os;
+        DataOutputStream dos;
         Server(ServerSocket s){
             this.s = s;
         }
@@ -72,10 +83,10 @@ public class ServerActivity extends Activity {
             super.run();
             while(true){
                 try{
-                    Socket s1 = s.accept();
+                    s1 = s.accept();
                     Log.d("Con Status","Cliente conectado");
-                    OutputStream os = s1.getOutputStream();
-                    DataOutputStream dos = new DataOutputStream(os);
+                    os = s1.getOutputStream();
+                    dos = new DataOutputStream(os);
                     dos.writeUTF("Hola Cliente");
                     //TODO se cierran los flujos y el socket
                     //dos.close();
