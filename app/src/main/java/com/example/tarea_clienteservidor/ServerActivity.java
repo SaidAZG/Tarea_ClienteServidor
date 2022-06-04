@@ -73,11 +73,12 @@ public class ServerActivity extends Activity {
             while(true){
                 try{
                     Socket s1 = s.accept();
+                    Log.d("Con Status","Cliente conectado");
                     OutputStream os = s1.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(os);
-                    dos.writeUTF("Hola ESCOM");
-                    dos.close();
+                    dos.writeUTF("Hola Cliente");
                     //TODO se cierran los flujos y el socket
+                    //dos.close();
                     //s1.close();
                     //s.close();
                 } catch(IOException e){

@@ -63,16 +63,17 @@ public class ClientActivity extends Activity {
                     }
                 });
                 desplegarMensaje(0,"Conexion con servidor ("+ip+": "+port+")");
+
+                InputStream is = s1.getInputStream();
+                DataInputStream dis = new DataInputStream(is);
                 while (true) {
-                    InputStream is = s1.getInputStream();
-                    DataInputStream dis = new DataInputStream(is);
                     String msgRecieved = dis.readUTF();
                     Log.d("Con Status",msgRecieved);
                     desplegarMensaje(1,msgRecieved);
                     //TODO Prueba para solo un echo de comunicacion, se cierran los flujos y el socket
-                    dis.close();
-                    s1.close();
                 }
+                //dis.close();
+                //s1.close();
             } catch(ConnectException ce){
                 Log.d("Con Status C","Servidor no conectado: "+ ce.getMessage());
                 desplegarMensaje(0,ce.getMessage());
