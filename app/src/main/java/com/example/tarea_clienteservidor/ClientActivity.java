@@ -50,42 +50,54 @@ public class ClientActivity extends Activity {
             if (Objects.requireNonNull(binding.etPort.getText()).length() > 0 && Objects.requireNonNull(binding.etIp.getText()).length() > 0){
                 port = Integer.parseInt(binding.etPort.getText().toString());
                 ip = binding.etIp.getText().toString();
+                Log.d("Socket Data","IP: "+ip);
+                Log.d("Socket Data","Port:" +port);
             }
             try{
                 Socket s1 = new Socket(ip, port);
-                binding.btnMsgClient.setEnabled(true);
-                binding.etMsgClient.setEnabled(true);
-                TextView tv = new TextView(ClientActivity.this);
-                tv.append("Conexion con el servidor iniciada...");
-                binding.svChatServer.addView(tv);
+                ClientActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        binding.btnMsgClient.setEnabled(true);
+                        binding.etMsgClient.setEnabled(true);
+                    }
+                });
+                desplegarMensaje(0,"Conexion con servidor ("+ip+": "+port+")");
                 while (true) {
                     InputStream is = s1.getInputStream();
                     DataInputStream dis = new DataInputStream(is);
-                    Log.d("Con Status",dis.readUTF());
-                    TextView tv2 = new TextView(ClientActivity.this);
-                    tv2.append("Servidor: "+dis.readUTF());
-                    binding.svChatServer.addView(tv2);
+                    String msgRecieved = dis.readUTF();
+                    Log.d("Con Status",msgRecieved);
+                    desplegarMensaje(1,msgRecieved);
+                    //TODO Prueba para solo un echo de comunicacion, se cierran los flujos y el socket
+                    dis.close();
+                    s1.close();
                 }
-                //dis.close();
-                //s1.close();
             } catch(ConnectException ce){
                 Log.d("Con Status C","Servidor no conectado: "+ ce.getMessage());
-                ClientActivity.this.runOnUiThread(() -> {
-                    TextView tv = new TextView(ClientActivity.this);
-                    tv.append("Error: "+ce.getMessage());
-                    tv.setTextColor(Color.RED);
-                    binding.svChatServer.addView(tv);
-                });
+                desplegarMensaje(0,ce.getMessage());
             } catch(IOException e){
                 Log.d("Con Status C","IOException: "+e.getMessage());
-                ClientActivity.this.runOnUiThread(() -> {
-                    TextView tv = new TextView(ClientActivity.this);
-                    tv.append("Error: "+e.getMessage());
-                    tv.setTextColor(Color.RED);
-                    binding.svChatServer.addView(tv);
-                });
-
+                desplegarMensaje(0,e.getMessage());
             }
         }
+    }
+
+    public void desplegarMensaje(int type,String msg){
+        ClientActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch(type){
+                    case 0:
+                        binding.tvChatClient.append("\nStatus: "+msg);
+                        break;
+                    case 1:
+                        binding.tvChatClient.append("\nServer: "+msg);
+                        break;
+                    case 2:
+                        binding.tvChatClient.append("\nClient: "+msg);
+                }
+            }
+        });
     }
 }

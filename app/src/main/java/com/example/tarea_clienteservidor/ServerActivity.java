@@ -48,18 +48,12 @@ public class ServerActivity extends Activity {
         try{
             s = new ServerSocket(port);
             Log.d("Con Status","Iniciado en puerto "+port);
-            TextView tv = new TextView(this);
-            tv.append("Servidor iniciado en puerto "+port);
-            binding.svChatServer.addView(tv);
+            desplegarMensajeServer(0,"Server iniciado en puerto: "+port);
             binding.btnMsgServer.setEnabled(true);
             binding.etMsgServer.setEnabled(true);
-            //tv.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-            //binding.text.append("\nServidor iniciado en puerto"+port);
         } catch(IOException e){
             Log.d("Con Status","No se puedo iniciar en puerto "+port);
-            TextView tv = new TextView(this);
-            tv.append("Servidor no se puede iniciar en puerto "+port);
-            //binding.text.append("\nServidor no se puede iniciar en puerto "+port);
+            desplegarMensajeServer(0,e.getMessage());
         }
 
         ServerSocket finalS = s;
@@ -68,12 +62,11 @@ public class ServerActivity extends Activity {
         server.start();
     }
 
-    public static class Server extends Thread{
+    public class Server extends Thread{
         ServerSocket s;
         Server(ServerSocket s){
             this.s = s;
         }
-
         @Override
         public void run() {
             super.run();
@@ -84,12 +77,32 @@ public class ServerActivity extends Activity {
                     DataOutputStream dos = new DataOutputStream(os);
                     dos.writeUTF("Hola ESCOM");
                     dos.close();
-                    s1.close();
+                    //TODO se cierran los flujos y el socket
+                    //s1.close();
                     //s.close();
                 } catch(IOException e){
                     Log.d("Con Status","No se puede iniciar el socket "+e.getMessage());
+                    break;
                 }
             }
         }
+    }
+
+    public void desplegarMensajeServer(int type,String msg){
+        ServerActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch(type){
+                    case 0:
+                        binding.tvChatServer.append("\nStatus: "+msg);
+                        break;
+                    case 1:
+                        binding.tvChatServer.append("\nServer: "+msg);
+                        break;
+                    case 2:
+                        binding.tvChatServer.append("\nClient: "+msg);
+                }
+            }
+        });
     }
 }
