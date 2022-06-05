@@ -63,7 +63,7 @@ public class ServerActivity extends Activity {
 
     private void sendMsg(Server server) {
         try{
-            String msg = "Hola nuevamente";
+            String msg = binding.etMsgServer.getText().toString();
             server.dos.writeUTF(msg);
             desplegarMensajeServer(1,msg);
         } catch (IOException e) {

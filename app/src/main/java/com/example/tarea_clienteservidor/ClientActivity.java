@@ -70,7 +70,7 @@ public class ClientActivity extends Activity {
 
     private void sendMsg(Client client) {
         try{
-            String msg = "Hola nuevamente server, soy el cliente";
+            String msg = binding.etMsgClient.getText().toString();
             client.dos.writeUTF(msg);
             desplegarMensaje(2,msg);
         } catch (IOException e) {
