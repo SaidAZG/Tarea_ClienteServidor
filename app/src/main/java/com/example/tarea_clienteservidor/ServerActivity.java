@@ -13,8 +13,10 @@ import androidx.annotation.Dimension;
 
 import com.example.tarea_clienteservidor.databinding.ActivityServerBinding;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -97,6 +99,8 @@ public class ServerActivity extends Activity {
         ServerSocket s;
         Socket s1;
         OutputStream os;
+        InputStream is;
+        DataInputStream dis;
         DataOutputStream dos;
         Server(ServerSocket s){
             this.s = s;
@@ -111,6 +115,8 @@ public class ServerActivity extends Activity {
                     os = s1.getOutputStream();
                     dos = new DataOutputStream(os);
                     dos.writeUTF("Hola Cliente");
+                    //TODO Comprobar si este es el lugar correcto para llamar a la funcion
+                    recieveMsg();
                     //TODO se cierran los flujos y el socket
                     //dos.close();
                     //s1.close();
@@ -119,6 +125,26 @@ public class ServerActivity extends Activity {
                     Log.d("Con Status","No se puede iniciar el socket "+e.getMessage());
                     break;
                 }
+            }
+        }
+
+        public void recieveMsg(){
+            try {
+                is = s1.getInputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            dis = new DataInputStream(is);
+            while (true) {
+                String msgRecieved = null;
+                try {
+                    msgRecieved = dis.readUTF();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("Con Status",msgRecieved);
+                desplegarMensajeServer(2,msgRecieved);
+                //TODO Prueba para solo un echo de comunicacion, se cierran los flujos y el socket
             }
         }
     }

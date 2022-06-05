@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -36,6 +37,8 @@ public class ClientActivity extends Activity {
         super.onCreate(savedInstanceState);
         binding = ActivityClientBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         binding.btnStartClient.setOnClickListener(v -> {
             if (Objects.requireNonNull(binding.etPort.getText()).length() > 0 && Objects.requireNonNull(binding.etIp.getText()).length() > 0){
